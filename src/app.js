@@ -3,10 +3,13 @@ const express = require('express');
 const app = express();
 
 
-app.get("/profile/:username", (req, res) => {
-    console.log(req.params);
-    res.send(req.params.username + " Profile page accessed");
-});
+app.use("/problems",[(req, res, next)=>{
+    // res.send("Hello from problems route!");
+    next();
+},[(req, res, next)=>{
+    res.send("this is the second route handler in problems route!");//connection already closed you cannot send the response again
+    next();
+}]])
 
 app.listen(3000, () => {
     console.log('Server is running on http://localhost:3000');
