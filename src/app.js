@@ -1,20 +1,20 @@
 const express = require("express");
-const { adminAuth } = require("./middlewares/adminMiddleware");
-const { userAuth } = require("./middlewares/userMiddleware");
 const app = express();
 
-app.get("/admin/dashboard", adminAuth, (req, res) => {
-  res.send("Admin Dashboard accessed");
+app.get("/calculate", (req, res) => {
+  const { num1, num2 } = req.query;
+  const number1 = parseFloat(num1);
+  const number2 = parseFloat(num2);
+  if (number2 === 0) throw new Error("Division by zero is not allowed");
+  const result = number1 / number2;
+  res.send(`The result of ${number1} divided by ${number2} is ${result}`);
 });
 
-app.get("/admin/profile", adminAuth, (req, res) => {
-  res.send("Admin Profile accessed");
+app.use("/", (err, req, res, next) => {
+  if (err) {
+    res.status(500).send("something went wrong");
+  }
 });
-
-app.get("/user/dashboard", userAuth, (req, res) => {
-  res.send("User Dashboard accessed");
-});
-
 app.listen(3000, () => {
   console.log("Server is running on http://localhost:3000");
 });
