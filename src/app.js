@@ -1,16 +1,20 @@
-const express = require('express');
-
+const express = require("express");
+const { adminAuth } = require("./middlewares/adminMiddleware");
+const { userAuth } = require("./middlewares/userMiddleware");
 const app = express();
 
+app.get("/admin/dashboard", adminAuth, (req, res) => {
+  res.send("Admin Dashboard accessed");
+});
 
-app.use("/problems",[(req, res, next)=>{
-    // res.send("Hello from problems route!");
-    next();
-},[(req, res, next)=>{
-    res.send("this is the second route handler in problems route!");//connection already closed you cannot send the response again
-    next();
-}]])
+app.get("/admin/profile", adminAuth, (req, res) => {
+  res.send("Admin Profile accessed");
+});
+
+app.get("/user/dashboard", userAuth, (req, res) => {
+  res.send("User Dashboard accessed");
+});
 
 app.listen(3000, () => {
-    console.log('Server is running on http://localhost:3000');
+  console.log("Server is running on http://localhost:3000");
 });
