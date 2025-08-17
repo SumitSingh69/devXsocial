@@ -1,7 +1,24 @@
 const express = require("express");
 const { connectDB } = require("./config/database");
-
+const User = require("./models/user");
 const app = express();
+
+app.post("/signup", async (req, res) => {
+  const user = {
+    firstName: "Sumit",
+    lastName: "Bora",
+    email: "sumt@bora.com",
+    password: "password123",
+    age: 25,
+  };
+  try {
+    const newUser = new User(user);
+    await newUser.save();
+    res.send("Signup successfull");
+  } catch (err) {
+    res.status(500).send("Internal Server Error");
+  }
+});
 
 connectDB()
   .then(() => {
