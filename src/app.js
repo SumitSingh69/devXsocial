@@ -3,23 +3,45 @@ const { connectDB } = require("./config/database");
 const User = require("./models/user");
 const app = express();
 
+//using a middleware to convert json to js object
+app.use(express.json());
 app.post("/signup", async (req, res) => {
-  const user = {
-    firstName: "Sumit",
-    lastName: "Bora",
-    email: "sumt@bora.com",
-    password: "password123",
-    age: 25,
-  };
   try {
-    const newUser = new User(user);
-    await newUser.save();
-    res.send("Signup successfull");
+    console.log(req.body); //cannot log body in raw json format
+    const user = new User(req.body);
+    await user.save(); //this should throw error
+    res.status(200).send("User signed up successfully");
   } catch (err) {
-    res.status(500).send("Internal Server Error");
+    res.status(400).send("stop sendind duplicate emails bastard");
   }
 });
 
+app.get("/user", async (req, res) => {
+  //find one user by id
+  try {
+    const users = await User.findById("68a16593558060cc89a38903");
+    if (!users) {
+      res.status(404).send("User not found");
+    } else {
+      res.status(200).send(users);
+    }
+  } catch (err) {
+    res.status(500).send("something went wrong");
+  }
+});
+
+app.get("/feed", async (req, res) => {
+  try {
+    const users = await User.find();
+    if (users.length === 0) {
+      res.status(404).send("No users found");
+    } else {
+      res.status(200).send(users);
+    }
+  } catch (err) {
+    res.status(500).send("something went wrong");
+  }
+});
 connectDB()
   .then(() => {
     console.log("Database connected successfully");
