@@ -42,6 +42,36 @@ app.get("/feed", async (req, res) => {
     res.status(500).send("something went wrong");
   }
 });
+
+app.delete("/user", async (req, res) => {
+  try {
+    const deletedUser = await User.findOneAndDelete({ email: req.body.email }); //returns the deleted user's document
+    if (!deletedUser) {
+      return res.status(404).send("User not found");
+    }
+    res.status(200).send("User deleted successfully");
+  } catch (err) {
+    res.status(500).send("something went wrong");
+  }
+});
+
+app.patch("/user", async (req, res) => {
+  // partial updation
+  const replacedData = req.body;
+  const filter = { email: req.body.email };
+  try {
+    const replacedUser = await User.findOneAndReplace(filter, replacedData);
+    console.log("Replaced User:", replacedUser);
+    if (!replacedUser) {
+      res.status(404).send("User not found");
+    } else {
+      res.status(200).send("User replaced successfully");
+    }
+  } catch (err) {
+    res.status(500).send("something went wrong");
+  }
+});
+
 connectDB()
   .then(() => {
     console.log("Database connected successfully");
