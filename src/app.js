@@ -19,7 +19,7 @@ app.post("/signup", async (req, res) => {
 app.get("/user", async (req, res) => {
   //find one user by id
   try {
-    const users = await User.findById("68a16593558060cc89a38903");
+    const users = await User.findById("68a165d4dd3d18e4a49296bf");
     if (!users) {
       res.status(404).send("User not found");
     } else {
@@ -57,17 +57,26 @@ app.delete("/user", async (req, res) => {
 
 app.patch("/user", async (req, res) => {
   // partial updation
-  const replacedData = req.body;
+  const updatedData = req.body;
   const filter = { email: req.body.email };
+  console.log(req.body.email);
   try {
-    const replacedUser = await User.findOneAndReplace(filter, replacedData);
-    console.log("Replaced User:", replacedUser);
+    const replacedUser = await User.findOneAndUpdate(
+      { email: req.body.email },
+      updatedData,
+      {
+        runValidators: true,
+        new: true,
+      }
+    );
+    console.log("Updated User:", replacedUser);
     if (!replacedUser) {
       res.status(404).send("User not found");
     } else {
-      res.status(200).send("User replaced successfully");
+      res.status(200).send("User updated successfully");
     }
   } catch (err) {
+    console.log(err);
     res.status(500).send("something went wrong");
   }
 });
