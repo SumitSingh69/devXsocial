@@ -9,10 +9,11 @@ app.post("/signup", async (req, res) => {
   try {
     console.log(req.body); //cannot log body in raw json format
     const user = new User(req.body);
-    await user.save(); //this should throw error
+    await user.save();
     res.status(200).send("User signed up successfully");
   } catch (err) {
-    res.status(400).send("stop sendind duplicate emails bastard");
+    console.log(err);
+    res.status(400).send("stop sending duplicate emails bastard" + err);
   }
 });
 
@@ -55,14 +56,36 @@ app.delete("/user", async (req, res) => {
   }
 });
 
-app.patch("/user", async (req, res) => {
+app.patch("/user/:id", async (req, res) => {
   // partial updation
+
+  //user should not be able to change his email id
   const updatedData = req.body;
-  const filter = { email: req.body.email };
-  console.log(req.body.email);
+  const userId = req.params?.id;
   try {
+    const ALLOWED_UPDATES = [
+      "firstName",
+      "midName",
+      "lastName",
+      "password",
+      "age",
+      "gender",
+      "about",
+      "photoUrl",
+      "skills",
+    ];
+    const isAllowedToUpdate = Object.keys(updatedData).every((key) =>
+      ALLOWED_UPDATES.includes(key)
+    );
+    console.log(isAllowedToUpdate);
+    if (!isAllowedToUpdate) {
+      throw new Error("Invalid updates!");
+    }
+    if (updatedData?.skills.length > 10) {
+      throw new Error("Cannot have more than 10 skills");
+    }
     const replacedUser = await User.findOneAndUpdate(
-      { email: req.body.email },
+      { _id: userId },
       updatedData,
       {
         runValidators: true,
@@ -76,7 +99,6 @@ app.patch("/user", async (req, res) => {
       res.status(200).send("User updated successfully");
     }
   } catch (err) {
-    console.log(err);
     res.status(500).send("something went wrong");
   }
 });
