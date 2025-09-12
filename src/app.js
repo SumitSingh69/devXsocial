@@ -2,18 +2,29 @@ const express = require("express");
 const { connectDB } = require("./config/database");
 const User = require("./models/user");
 const app = express();
+const userValidator = require("./utils/userValidator");
+const bcrypt = require("bcrypt");
 
 //using a middleware to convert json to js object
 app.use(express.json());
 app.post("/signup", async (req, res) => {
   try {
-    console.log(req.body); //cannot log body in raw json format
-    const user = new User(req.body);
+    userValidator(req);
+    const { firstName, midName = "", lastName, email, password } = req.body;
+    //hash the password and store the hash password in the DB instead of the real password
+    const hashPassword = await bcrypt.hash(password, 10);
+    const user = new User({
+      firstName,
+      midName,
+      lastName,
+      email,
+      password: hashPassword,
+    });
     await user.save();
     res.status(200).send("User signed up successfully");
   } catch (err) {
     console.log(err);
-    res.status(400).send("stop sending duplicate emails bastard" + err);
+    res.status(400).send("singup failed " + err);
   }
 });
 
