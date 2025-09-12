@@ -27,7 +27,25 @@ app.post("/signup", async (req, res) => {
     res.status(400).send("singup failed " + err);
   }
 });
-
+app.post("/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    //check wheter this is a regitered email id
+    const registeredUser = await User.findOne({ email: email });
+    if (!registeredUser) {
+      throw new Error("invalid crendentials");
+    }
+    //compare the registerd user's password to the password provided
+    const isMatch = await bcrypt.compare(password, registeredUser.password);
+    if (!isMatch) {
+      throw new Error("invalid crendentials");
+    }
+    res.status(200).send("User logged in successfully");
+  } catch (err) {
+    console.log(err);
+    res.status(400).send("login failed " + err);
+  }
+});
 app.get("/user", async (req, res) => {
   //find one user by id
   try {
