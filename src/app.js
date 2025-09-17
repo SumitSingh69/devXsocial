@@ -6,6 +6,7 @@ const userValidator = require("./utils/userValidator");
 const bcrypt = require("bcrypt");
 var cookieParser = require("cookie-parser");
 var jwt = require("jsonwebtoken");
+const userAuth = require("./middlewares/userMiddleware");
 //using a middleware to convert json to js object
 app.use(express.json());
 app.use(cookieParser());
@@ -43,9 +44,11 @@ app.post("/login", async (req, res) => {
       throw new Error("invalid crendentials");
     }
     //generate a JWT token
-    const token = jwt.sign({ _id: registeredUser._id }, "topSecret234"); // userId is the hidden field here
+    const token = registeredUser.getJWT();
     console.log(token);
-    res.cookie("token", token);
+    res.cookie("token", token, {
+      expires: new Date(Date.now() + 7 * 3600000),
+    });
     res.status(200).send("User logged in successfully");
   } catch (err) {
     console.log(err);
@@ -53,25 +56,11 @@ app.post("/login", async (req, res) => {
   }
 });
 
-app.get("/profile", async (req, res) => {
+app.get("/profile", userAuth, (req, res) => {
   try {
-    const token = req.cookies;
-    if (!token) {
-      throw new Error("unauthenticated");
-    }
-    //decode the token get the hidden userId and find the user by his id
-    const recievedToken = token?.token;
-    const decoded = jwt.verify(recievedToken, "topSecret234");
-    console.log(decoded);
-    if (!decoded) {
-      throw new Error("unauthenticated");
-    }
-    const userId = decoded._id;
-    const userProfile = await User.findById(userId);
-    if (!userProfile) {
-      throw new Error("unauthenticated");
-    }
-
+    const userProfile = req.user;
+    console.log(req.user);
+    console.log(userProfile);
     res.status(200).send({
       message: "User profile fetched successfully",
       userProfile,
@@ -80,89 +69,12 @@ app.get("/profile", async (req, res) => {
     throw err;
   }
 });
-app.get("/user", async (req, res) => {
-  //find one user by id
+app.post("/sendRequest", userAuth, (req, res) => {
   try {
-    const users = await User.findById("68a165d4dd3d18e4a49296bf");
-    if (!users) {
-      res.status(404).send("User not found");
-    } else {
-      res.status(200).send(users);
-    }
+    const userName = req.user.firstName;
+    res.status(200).send(`Request sent successfully by ${userName}`);
   } catch (err) {
-    res.status(500).send("something went wrong");
-  }
-});
-
-app.get("/feed", async (req, res) => {
-  try {
-    const users = await User.find();
-    if (users.length === 0) {
-      res.status(404).send("No users found");
-    } else {
-      res.status(200).send(users);
-    }
-  } catch (err) {
-    res.status(500).send("something went wrong");
-  }
-});
-
-app.delete("/user", async (req, res) => {
-  try {
-    const deletedUser = await User.findOneAndDelete({ email: req.body.email }); //returns the deleted user's document
-    if (!deletedUser) {
-      return res.status(404).send("User not found");
-    }
-    res.status(200).send("User deleted successfully");
-  } catch (err) {
-    res.status(500).send("something went wrong");
-  }
-});
-
-app.patch("/user/:id", async (req, res) => {
-  // partial updation
-
-  //user should not be able to change his email id
-  const updatedData = req.body;
-  const userId = req.params?.id;
-  try {
-    const ALLOWED_UPDATES = [
-      "firstName",
-      "midName",
-      "lastName",
-      "password",
-      "age",
-      "gender",
-      "about",
-      "photoUrl",
-      "skills",
-    ];
-    const isAllowedToUpdate = Object.keys(updatedData).every((key) =>
-      ALLOWED_UPDATES.includes(key)
-    );
-    console.log(isAllowedToUpdate);
-    if (!isAllowedToUpdate) {
-      throw new Error("Invalid updates!");
-    }
-    if (updatedData?.skills.length > 10) {
-      throw new Error("Cannot have more than 10 skills");
-    }
-    const replacedUser = await User.findOneAndUpdate(
-      { _id: userId },
-      updatedData,
-      {
-        runValidators: true,
-        new: true,
-      }
-    );
-    console.log("Updated User:", replacedUser);
-    if (!replacedUser) {
-      res.status(404).send("User not found");
-    } else {
-      res.status(200).send("User updated successfully");
-    }
-  } catch (err) {
-    res.status(500).send("something went wrong");
+    throw err;
   }
 });
 
