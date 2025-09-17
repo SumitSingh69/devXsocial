@@ -4,9 +4,11 @@ const User = require("./models/user");
 const app = express();
 const userValidator = require("./utils/userValidator");
 const bcrypt = require("bcrypt");
-
+var cookieParser = require("cookie-parser");
+var jwt = require("jsonwebtoken");
 //using a middleware to convert json to js object
 app.use(express.json());
+app.use(cookieParser());
 app.post("/signup", async (req, res) => {
   try {
     userValidator(req);
@@ -40,10 +42,42 @@ app.post("/login", async (req, res) => {
     if (!isMatch) {
       throw new Error("invalid crendentials");
     }
+    //generate a JWT token
+    const token = jwt.sign({ _id: registeredUser._id }, "topSecret234"); // userId is the hidden field here
+    console.log(token);
+    res.cookie("token", token);
     res.status(200).send("User logged in successfully");
   } catch (err) {
     console.log(err);
     res.status(400).send("login failed " + err);
+  }
+});
+
+app.get("/profile", async (req, res) => {
+  try {
+    const token = req.cookies;
+    if (!token) {
+      throw new Error("unauthenticated");
+    }
+    //decode the token get the hidden userId and find the user by his id
+    const recievedToken = token?.token;
+    const decoded = jwt.verify(recievedToken, "topSecret234");
+    console.log(decoded);
+    if (!decoded) {
+      throw new Error("unauthenticated");
+    }
+    const userId = decoded._id;
+    const userProfile = await User.findById(userId);
+    if (!userProfile) {
+      throw new Error("unauthenticated");
+    }
+
+    res.status(200).send({
+      message: "User profile fetched successfully",
+      userProfile,
+    });
+  } catch (err) {
+    throw err;
   }
 });
 app.get("/user", async (req, res) => {
