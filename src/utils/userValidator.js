@@ -14,4 +14,21 @@ const userValidator = (req) => {
   }
 };
 
-module.exports = userValidator;
+const updateProfileValidator = (req) => {
+  const allowedUpdates = [
+    "firstName",
+    "midName",
+    "lastName",
+    "about",
+    "age",
+    "photoUrl",
+    "gender",
+    "skills",
+  ];
+  const isEditAllowed = Object.keys(req.body).every((field) =>
+    allowedUpdates.includes(field)
+  );
+  return isEditAllowed;
+};
+
+module.exports = { userValidator, updateProfileValidator };
