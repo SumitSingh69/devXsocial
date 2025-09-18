@@ -50,4 +50,40 @@ requestRouter.post(
     }
   }
 );
+
+requestRouter.post(
+  "/request/review/:status/:requestId",
+  userAuth,
+  async (req, res) => {
+    try {
+      /*
+    Steps:
+    validate the status -> we need to verify that the one who accepted or rejected the request actually had such a request in the first place
+    where he was the reciever of the request and the status was "interested" also with the requestId provided
+    
+    */
+      const status = req.params.status;
+      const validStatus = ["accepted", "rejected"];
+      if (!validStatus.includes(status)) {
+        throw new Error("invalid status");
+      }
+      const requestId = req.params.requestId;
+      const request = await ConnectionRequest.findOne({
+        _id: requestId,
+        toUserId: req.user._id,
+        status: "interested",
+      });
+      if (!request) {
+        throw new Error("No such request found");
+      }
+      request.status = status;
+      await request.save();
+      res
+        .status(200)
+        .send(`Request ${requestId} has been ${status} successfully`);
+    } catch (err) {
+      throw err;
+    }
+  }
+);
 module.exports = requestRouter;
