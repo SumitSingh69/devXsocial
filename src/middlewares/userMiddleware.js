@@ -3,13 +3,14 @@ const User = require("../models/user");
 
 const userAuth = async (req, res, next) => {
   try {
+    console.log("hello ji");
     console.log(req.cookies);
     const token = req.cookies?.token;
 
     if (!token) {
       res.status(401).send("you are not logged in , login first");
     }
-    const recievedToken = token?.token;
+    const recievedToken = token;
     const decoded = jwt.verify(recievedToken, "topSecret234");
     if (!decoded) {
       throw new Error("unauthenticated");
