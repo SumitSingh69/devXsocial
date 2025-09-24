@@ -41,6 +41,10 @@ authRouter.post("/login", async (req, res) => {
     const token = registeredUser.getJWT();
     console.log(token);
     res.cookie("token", token, {
+      httpOnly: true,
+      secure: false,
+      sameSite: "strict",
+      path: "/",
       expires: new Date(Date.now() + 7 * 3600000),
     });
     console.log(registeredUser);
@@ -54,10 +58,12 @@ authRouter.post("/login", async (req, res) => {
     res.status(400).send("login failed " + err);
   }
 });
-
 authRouter.post("/logout", (req, res) => {
-  res.cookie("token", null, {
-    expires: new Date(Date.now()),
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: false, // must match the login cookie in dev
+    sameSite: "strict",
+    path: "/",
   });
   res.send("User logged out successfully");
 });
