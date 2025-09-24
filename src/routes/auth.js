@@ -35,7 +35,7 @@ authRouter.post("/login", async (req, res) => {
     //compare the registerd user's password to the password provided
     const isMatch = await bcrypt.compare(password, registeredUser.password);
     if (!isMatch) {
-      throw new Error("invalid crendentials");
+      res.status(404).send("user not found");
     }
     //generate a JWT token
     const token = registeredUser.getJWT();
