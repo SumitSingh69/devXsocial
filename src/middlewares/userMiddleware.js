@@ -3,7 +3,9 @@ const User = require("../models/user");
 
 const userAuth = async (req, res, next) => {
   try {
-    const token = req.cookies;
+    console.log(req.cookies);
+    const token = req.cookies?.token;
+
     if (!token) {
       res.status(401).send("you are not logged in , login first");
     }
@@ -20,7 +22,8 @@ const userAuth = async (req, res, next) => {
     req.user = user;
     next();
   } catch (err) {
-    res.status(400).send("authentication failed " + err);
+    console.log("bad ");
+    res.status(400).send("authentication failed " + err.message);
   }
 };
 
