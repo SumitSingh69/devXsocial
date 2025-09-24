@@ -5,7 +5,7 @@ const userAuth = async (req, res, next) => {
   try {
     const token = req.cookies;
     if (!token) {
-      throw new Error("unauthenticated");
+      res.status(401).send("you are not logged in , login first");
     }
     const recievedToken = token?.token;
     const decoded = jwt.verify(recievedToken, "topSecret234");
