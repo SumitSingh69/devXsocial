@@ -82,7 +82,7 @@ userRouter.get("/feed", userAuth, async (req, res) => {
       .skip((page - 1) * limit)
       .limit(limit)
       .select("firstName midName lastName");
-    res.status(200).send({
+    res.status(200).json({
       message: "Feed users fetched successfully",
       feedUsers,
       currentPage: page,
