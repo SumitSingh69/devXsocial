@@ -31,7 +31,10 @@ userRouter.get("/user/connections", userAuth, async (req, res) => {
     const connnections = await ConnectionRequest.find({
       $or: [{ fromUserId: userId }, { toUserId: userId }],
       status: "accepted",
-    }).populate("fromUserId toUserId", "firstName midName lastName");
+    }).populate(
+      "fromUserId toUserId",
+      "firstName midName lastName photoUrl age gender"
+    );
 
     const allConnections = connnections.map((connection) => {
       if (connection.fromUserId._id.toString() === userId.toString()) {
@@ -81,7 +84,7 @@ userRouter.get("/feed", userAuth, async (req, res) => {
     })
       .skip((page - 1) * limit)
       .limit(limit)
-      .select("firstName midName lastName");
+      .select("firstName midName lastName about age gender photoUrl");
     res.status(200).json({
       message: "Feed users fetched successfully",
       feedUsers,

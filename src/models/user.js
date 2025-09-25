@@ -60,6 +60,7 @@ const userSchema = mongoose.Schema(
     },
     about: {
       type: String,
+      default: "Hi, how are you",
       required: false,
     },
     gender: {
