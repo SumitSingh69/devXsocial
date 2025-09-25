@@ -14,7 +14,10 @@ userRouter.get("/user/requests/recieved", userAuth, async (req, res) => {
     const recievedRequests = await ConnectionRequest.find({
       toUserId: userId,
       status: "interested",
-    }).populate("fromUserId", "firstName midName lastName");
+    }).populate(
+      "fromUserId",
+      "firstName midName lastName photoUrl age gender about"
+    );
 
     res.status(200).send({
       message: "Recieved requests fetched successfully",
