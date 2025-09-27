@@ -3,8 +3,6 @@ const User = require("../models/user");
 
 const userAuth = async (req, res, next) => {
   try {
-    console.log("hello ji");
-    console.log(req.cookies);
     const token = req.cookies?.token;
 
     if (!token) {
@@ -23,7 +21,6 @@ const userAuth = async (req, res, next) => {
     req.user = user;
     next();
   } catch (err) {
-    console.log("bad ");
     res.status(400).send("authentication failed " + err.message);
   }
 };

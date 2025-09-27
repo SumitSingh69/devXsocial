@@ -28,7 +28,6 @@ authRouter.post("/signup", async (req, res) => {
       .status(200)
       .json({ message: "User signed up successfully", data: savedUser });
   } catch (err) {
-    console.log(err);
     res.status(400).send("singup failed " + err);
   }
 });
@@ -47,7 +46,6 @@ authRouter.post("/login", async (req, res) => {
     }
     //generate a JWT token
     const token = registeredUser.getJWT();
-    console.log(token);
     res.cookie("token", token, {
       httpOnly: true,
       secure: false,
@@ -55,14 +53,12 @@ authRouter.post("/login", async (req, res) => {
       path: "/",
       expires: new Date(Date.now() + 7 * 3600000),
     });
-    console.log(registeredUser);
     res.status(200).json({
       success: true,
       message: "User logged in successfully",
       data: registeredUser,
     });
   } catch (err) {
-    console.log(err);
     res.status(400).send("login failed " + err);
   }
 });

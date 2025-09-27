@@ -38,7 +38,6 @@ profileRouter.patch("/profile/update", userAuth, async (req, res) => {
 
 profileRouter.patch("/profile/password/update", userAuth, async (req, res) => {
   try {
-    console.log("working");
     const { password, confirmPassword } = req.body;
     if (!password || !confirmPassword) {
       throw new Error("Both password and confirm password are required");

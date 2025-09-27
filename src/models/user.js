@@ -79,8 +79,7 @@ const userSchema = mongoose.Schema(
 
 userSchema.methods.getJWT = function () {
   const user = this;
-  console.log("generating JWT token");
-  const token = jwt.sign({ _id: user._id }, "topSecret234", {
+  const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
     expiresIn: "7d",
   }); // userId is the hidden field here
   return token;
