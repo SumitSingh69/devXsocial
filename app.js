@@ -1,5 +1,5 @@
 const express = require("express");
-const { connectDB } = require("./config/database");
+const { connectDB } = require("./src/config/database");
 const app = express();
 var cookieParser = require("cookie-parser");
 const cors = require("cors");
@@ -8,10 +8,10 @@ app.use(cors({ origin: "http://localhost:5173", credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
 require("dotenv").config();
-const authRouter = require("./routes/auth");
-const profileRouter = require("./routes/profile");
-const requestRouter = require("./routes/request");
-const userRouter = require("./routes/user");
+const authRouter = require("./src/routes/auth");
+const profileRouter = require("./src/routes/profile");
+const requestRouter = require("./src/routes/request");
+const userRouter = require("./src/routes/user");
 
 app.use("/", authRouter);
 app.use("/", profileRouter);
