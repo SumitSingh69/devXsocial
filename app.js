@@ -6,7 +6,7 @@ const cors = require("cors");
 //using a middleware to convert json to js object and to parse cookies for further reading
 app.use(
   cors({
-    origin: "https://dev-xsocial-frontend-z6a6.vercel.app",
+    origin: "https://dev-xsocial-frontend.vercel.app/",
     credentials: true,
   })
 );
