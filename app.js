@@ -4,7 +4,12 @@ const app = express();
 var cookieParser = require("cookie-parser");
 const cors = require("cors");
 //using a middleware to convert json to js object and to parse cookies for further reading
-app.use(cors({ origin: "http://localhost:5173", credentials: true }));
+app.use(
+  cors({
+    origin: "https://dev-xsocial-frontend-z6a6.vercel.app",
+    credentials: true,
+  })
+);
 app.use(express.json());
 app.use(cookieParser());
 require("dotenv").config();
