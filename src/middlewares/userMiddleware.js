@@ -9,7 +9,7 @@ const userAuth = async (req, res, next) => {
       res.status(401).send("you are not logged in , login first");
     }
     const recievedToken = token;
-    const decoded = jwt.verify(recievedToken, "topSecret234");
+    const decoded = jwt.verify(recievedToken, process.env.JWT_SECRET);
     if (!decoded) {
       throw new Error("unauthenticated");
     }
